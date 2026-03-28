@@ -7,8 +7,8 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/lib/pq"
 	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 var DB *sql.DB
@@ -53,12 +53,12 @@ func ConnectDB() {
 	}()
 
 	select {
-		case err := <-done:
-			if err != nil {
-				log.Fatal("Database unreachable")
-			}
-			case <-time.After(5 * time.Second):
-			log.Fatal("Database connection timeout")
+	case err := <-done:
+		if err != nil {
+			log.Fatal("Database unreachable")
+		}
+	case <-time.After(5 * time.Second):
+		log.Fatal("Database connection timeout")
 	}
 
 	log.Println("Database connected successfully")

@@ -89,6 +89,7 @@ The current schema includes:
 | verification_code | VARCHAR(100) | Email verification code |
 | created_at | TIMESTAMP | Account creation time |
 | updated_at | TIMESTAMP | Last update time (auto-updated) |
+| verification_expires | TIMESTAMP | expiriation code 24 houers |
 
 ## Environment Configuration
 
