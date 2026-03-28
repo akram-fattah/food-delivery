@@ -14,7 +14,7 @@ var emailRegex = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
 var usernameRegex = regexp.MustCompile(`^[a-zA-Z0-9_-]+$`)
 
 
-func isStrongPassword(p string) bool {
+func IsStrongPassword(p string) bool {
 	if len(p) < 6 || len(p) > 20 {
 		return false
 	}
@@ -72,7 +72,7 @@ func ValidateUser(u models.User) error {
 	if len(u.Password) < 6 || len(u.Password) > 20{
 		return errors.New("كلمة المرور يجب أن تكون 6 أحرف على الأقل و20 حرفًا كحد أقصى")
 	}
-	if !isStrongPassword(u.Password) {
+	if !IsStrongPassword(u.Password) {
 		return errors.New("كلمة المرور يجب أن تحتوي على حرف كبير، حرف صغير، رقم، ورمز خاص")
 	}
 

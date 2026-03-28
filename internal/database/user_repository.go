@@ -39,6 +39,13 @@ func IsEmailExists(ctx context.Context, email string) (bool, error) {
 	return exists, err
 }
 
+func IsUsernameExists(ctx context.Context, username string) (bool, error) {
+	var exists bool
+	query := `SELECT EXISTS(SELECT 1 FROM users WHERE username=$1)`
+	err := DB.QueryRowContext(ctx, query, username).Scan(&exists)
+	return exists, err
+}
+
 func GetUserByEmail(ctx context.Context, email string) (models.User, error) {
 	var u models.User
 
@@ -76,4 +83,33 @@ func VerifyUserEmail(ctx context.Context, email, code string) (bool, error) {
 	}
 
 	return rows > 0, nil
+}
+
+func SetUserVerificationCode(ctx context.Context, email, code string, expires time.Time) error {
+	query := `
+		UPDATE users
+		SET verification_code = $1, verification_expires = $2
+		WHERE email = $3
+	`
+	_, err := DB.ExecContext(ctx, query, code, expires, email)
+	return err
+}
+
+func VerifyResetCode(ctx context.Context, email, code string) (bool, error) {
+	var expires time.Time
+	query := `SELECT verification_expires FROM users WHERE email = $1 AND verification_code = $2`
+	err := DB.QueryRowContext(ctx, query, email, code).Scan(&expires)
+	if err != nil {
+		return false, nil 
+	}
+	if time.Now().After(expires) {
+		return false, nil
+	}
+	return true, nil
+}
+
+func UpdateUserPasswordAndClearCode(ctx context.Context, email, hashedPassword string) error {
+	query := `UPDATE users SET password = $1, verification_code = NULL, verification_expires = NULL WHERE email = $2`
+	_, err := DB.ExecContext(ctx, query, hashedPassword, email)
+	return err
 }
