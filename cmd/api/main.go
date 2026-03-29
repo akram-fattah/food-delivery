@@ -14,6 +14,7 @@ func HandleFunc() {
 	http.HandleFunc("/auth/verify-email", handlers.VerifyEmail)
 	http.HandleFunc("/auth/login", handlers.Login)
 	http.HandleFunc("/auth/update-password", handlers.UpdatePassword)
+	http.HandleFunc("/auth/refresh", handlers.RefreshToken)
 }
 
 func main() {
