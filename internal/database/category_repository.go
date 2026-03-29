@@ -106,3 +106,12 @@ func DeleteCategory(ctx context.Context, id int) error {
 
 	return nil
 }
+
+
+func CategoryExists(ctx context.Context, id int) (bool, error) {
+	query := `SELECT EXISTS(SELECT 1 FROM categories WHERE id = $1)`
+	var exists bool
+
+	err := DB.QueryRowContext(ctx, query, id).Scan(&exists)
+	return exists, err
+}
