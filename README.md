@@ -1,4 +1,5 @@
-# Food Delivery API
+
+# 🍔 Food Delivery API 🚀
 
 A RESTful API for a food delivery application built with Go and PostgreSQL.
 
@@ -23,37 +24,40 @@ Before you begin, ensure you have the following installed:
 
 ## Project Structure (Updated)
 
+
 ```
 food-delivery/
 ├── cmd/
 │   └── api/
-│       └── main.go              # Application entry point & HTTP routes
+│       └── main.go              # 🚦 Application entry point & HTTP routes
 ├── internal/
 │   ├── database/
-│   │   ├── database.go          # Database connection logic
-│   │   ├── refresh_token_repository.go # Refresh token DB logic
-│   │   └── user_repository.go   # User DB logic (create, verify, reset, etc)
+│   │   ├── database.go                  # 🗄️ Database connection logic
+│   │   ├── refresh_token_repository.go  # 🔄 Refresh token DB logic
+│   │   └── user_repository.go           # 👤 User DB logic (create, verify, reset, etc)
 │   ├── handlers/
-│   │   ├── login.go             # /auth/login endpoint
-│   │   ├── logout.go            # /auth/logout endpoint
-│   │   ├── register.go          # /auth/register endpoint
-│   │   ├── reset_password.go    # /auth/reset-password endpoint
-│   │   └── verifyEmail.go       # /auth/verify-email endpoint
+│   │   ├── login.go             # 🔑 /auth/login endpoint
+│   │   ├── logout.go            # 🚪 /auth/logout endpoint
+│   │   ├── register.go          # 📝 /auth/register endpoint
+│   │   ├── reset_password.go    # 🔒 /auth/reset-password endpoint
+│   │   ├── update_password.go   # 🛠️ /auth/update-password endpoint
+│   │   ├── refresh.go           # ♻️ /auth/refresh endpoint
+│   │   └── verifyEmail.go       # ✅ /auth/verify-email endpoint
 │   ├── helper/
-│   │   ├── code_helper.go       # Code generation (verification, reset)
-│   │   ├── config.go            # Config helpers
-│   │   ├── email_helper.go      # Email sending logic
-│   │   ├── response_helper.go   # JSON/error helpers
-│   │   ├── security_helper.go   # Password hashing
-│   │   └── user.go              # User validation helpers
+│   │   ├── code_helper.go       # 🧩 Code generation (verification, reset)
+│   │   ├── config.go            # ⚙️ Config helpers
+│   │   ├── email_helper.go      # 📧 Email sending logic
+│   │   ├── response_helper.go   # 📦 JSON/error helpers
+│   │   ├── security_helper.go   # 🛡️ Password hashing
+│   │   └── user.go              # 👤 User validation helpers
 │   └── models/
-│       └── user.go              # User struct definition
-├── uploads/                     # (for user uploads, if needed)
-├── delivery_db.sql              # Database schema
-├── go.mod                       # Go module dependencies
-├── go.sum                       # Go module checksums
-├── .env                         # Environment variables
-└── README.md                    # This file
+│       └── user.go              # 🧑‍💻 User struct definition
+├── uploads/                     # 🖼️ (for user uploads, if needed)
+├── delivery_db.sql              # 🗃️ Database schema
+├── go.mod                       # 📦 Go module dependencies
+├── go.sum                       # 📑 Go module checksums
+├── .env                         # 🌱 Environment variables
+└── README.md                    # 📖 This file
 ```
 
 ## Database Setup
@@ -92,22 +96,37 @@ psql -U postgres -d delivery_db -f delivery_db.sql
 
 The current schema includes:
 
-**Users Table:**
-| Field | Type | Description |
-|-------|------|-------------|
-| id | BIGSERIAL | Primary key, auto-increment |
-| username | VARCHAR(50) | Unique username |
-| name | VARCHAR(100) | Full name |
-| email | VARCHAR(150) | Unique email address |
-| password | VARCHAR(255) | Hashed password |
-| phone | VARCHAR(20) | Phone number (optional) |
-| address | TEXT | User address (optional) |
-| role | VARCHAR(20) | User role: 'user', 'admin', or 'Delivery' |
-| is_verified | BOOLEAN | Email verification status |
-| verification_code | VARCHAR(100) | Email verification code |
-| created_at | TIMESTAMP | Account creation time |
-| updated_at | TIMESTAMP | Last update time (auto-updated) |
-| verification_expires | TIMESTAMP | expiriation code 24 houers |
+
+### 👤 Users Table
+| 🏷️ Field             | 🗃️ Type         | 📝 Description                       |
+|----------------------|----------------|--------------------------------------|
+| id                   | BIGSERIAL      | Primary key, auto-increment          |
+| username             | VARCHAR(50)    | Unique username                      |
+| name                 | VARCHAR(100)   | Full name                            |
+| email                | VARCHAR(150)   | Unique email address                 |
+| password             | VARCHAR(255)   | Hashed password                      |
+| phone                | VARCHAR(20)    | Phone number (optional)              |
+| address              | TEXT           | User address (optional)              |
+| role                 | VARCHAR(20)    | User role: 'user', 'admin', 'Delivery'|
+| is_verified          | BOOLEAN        | Email verification status            |
+| verification_code    | VARCHAR(100)   | Email verification code              |
+| created_at           | TIMESTAMP      | Account creation time                |
+| updated_at           | TIMESTAMP      | Last update time (auto-updated)      |
+| verification_expires | TIMESTAMP      | Verification code expiration (24h)   |
+
+### 🔄 Refresh Tokens Table
+| 🏷️ Field     | 🗃️ Type     | 📝 Description                                 |
+|--------------|------------|-----------------------------------------------|
+| id           | SERIAL     | Primary key, auto-increment                   |
+| user_id      | INTEGER    | References users(id), owner of the token      |
+| token        | TEXT       | The refresh token value                       |
+| expires_at   | TIMESTAMP  | Expiration date/time of the refresh token     |
+| created_at   | TIMESTAMP  | Creation timestamp (default: now)             |
+
+**How it works:**
+- Each refresh token is linked to a user and is used to obtain new access tokens without re-authenticating.
+- When a user logs out, the refresh token is deleted from this table.
+- Expired tokens are rejected automatically.
 
 ## Environment Configuration
 
@@ -219,27 +238,56 @@ This project is currently in active development. The database layer is fully con
 
 ## API Usage (Current Stage)
 
-### 1. Register
+
+## 🚦 API Endpoints
+
+### 📝 Register
 - **POST** `/auth/register`
 - Registers a new user and sends a verification code to their email.
 
-### 2. Verify Email
+### ✅ Verify Email
 - **POST** `/auth/verify-email`
 - Verifies the user's email using the code sent.
 
-### 3. Login
+### 🔑 Login
 - **POST** `/auth/login`
-- Authenticates the user and returns tokens.
+- Authenticates the user and returns access/refresh tokens.
 
-### 4. Logout
+### 🚪 Logout
 - **POST** `/auth/logout`
 - Logs out the user (invalidates refresh token).
 
-### 5. Reset Password (Secure)
+### ♻️ Refresh Token
+- **POST** `/auth/refresh`
+- Request body: `{ "refresh_token": "..." }`
+- Returns a new access token if the refresh token is valid and not expired.
+- Example response:
+  ```json
+  { "access_token": "..." }
+  ```
+
+### 🔒 Reset Password (Request Code)
 - **POST** `/auth/reset-password`
 - Request body: `{ "email": "user@example.com" }`
 - Always returns a generic success message, even if the email does not exist (prevents user enumeration).
 - If the email exists, a reset code is sent to the email (valid for 24 hours).
+
+### 🛠️ Update Password
+- **POST** `/auth/update-password`
+- Request body:
+  ```json
+  {
+    "email": "user@example.com",
+    "code": "123456",
+    "password": "NewPassword@123",
+    "confirmPassword": "NewPassword@123"
+  }
+  ```
+- Updates the user's password if the code is valid and not expired. Always returns a generic message for security.
+- Example response:
+  ```json
+  { "message": "Password updated if data is correct." }
+  ```
 
 #### Example Request
 ```bash
@@ -261,7 +309,6 @@ curl -X POST http://localhost:8000/auth/reset-password \
 - The endpoint for confirming the code and updating the password is already implemented and documented below.
 
 ## Password Reset & Update Flow
-
 ### 1. Request Password Reset
 - **POST** `/auth/reset-password`
 - Request body:
@@ -331,6 +378,7 @@ curl -X POST http://localhost:8000/auth/reset-password \
   2. Ask for the code (from email) and new password (with confirmation) to update password.
 - No sensitive info is leaked in any response.
 
+
 ## Troubleshooting
 
 ### Database Connection Issues
@@ -353,12 +401,20 @@ curl -X POST http://localhost:8000/auth/reset-password \
 3. Verify the file is named exactly `.env` (not `.env.txt` or similar)
 
 ## Contributing
-
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/new-feature`)
 3. Commit your changes (`git commit -m 'Add new feature'`)
 4. Push to the branch (`git push origin feature/new-feature`)
 5. Open a Pull Request
+
+---
+
+<p align="center">
+  <img src="https://em-content.zobj.net/source/microsoft-teams/363/bento-box_1f96a.png" width="60"/>
+  <img src="https://em-content.zobj.net/source/microsoft-teams/363/takeout-box_1f961.png" width="60"/>
+  <img src="https://em-content.zobj.net/source/microsoft-teams/363/pizza_1f355.png" width="60"/>
+  <img src="https://em-content.zobj.net/source/microsoft-teams/363/cooking_1f373.png" width="60"/>
+</p>
 
 ## License
 

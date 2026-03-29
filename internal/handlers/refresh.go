@@ -14,6 +14,11 @@ import (
 var jwtKeyRefresh = helper.GetJWTKey()
 
 func RefreshToken(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	var input struct {
 		RefreshToken string `json:"refresh_token"`
 	}
