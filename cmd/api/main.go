@@ -15,6 +15,13 @@ func HandleFunc() {
 	http.HandleFunc("/auth/login", handlers.Login)
 	http.HandleFunc("/auth/update-password", handlers.UpdatePassword)
 	http.HandleFunc("/auth/refresh", handlers.RefreshToken)
+
+	http.HandleFunc("/create/categories", handlers.CreateCategory)
+	http.HandleFunc("/categories", handlers.GetCategories)
+	http.HandleFunc("/categories/", handlers.GetCategoryByID)
+	http.HandleFunc("/update/categories/", handlers.UpdateCategory)
+	http.HandleFunc("/delete/categories/", handlers.DeleteCategory)
+
 }
 
 func main() {
