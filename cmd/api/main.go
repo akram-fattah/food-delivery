@@ -21,6 +21,8 @@ func HandleFunc() {
 	http.HandleFunc("/categories/", handlers.GetCategoryByID)
 	http.HandleFunc("/update/categories/", handlers.UpdateCategory)
 	http.HandleFunc("/delete/categories/", handlers.DeleteCategory)
+	http.HandleFunc("/meals", handlers.CreateMeal)
+	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 }
 
