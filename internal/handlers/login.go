@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"encoding/json"
-	"net/http"
-	"time"
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"encoding/json"
+	"net/http"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -24,10 +24,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
+
 	var input struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
+
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		helper.SendError(w, "بيانات غير صالحة", http.StatusBadRequest)
 		return
@@ -35,7 +37,10 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	var user models.User
 	query := "SELECT id, password, role, is_verified FROM users WHERE email = $1"
-	err := database.DB.QueryRow(query, input.Email).Scan(&user.ID, &user.Password, &user.Role, &user.IsVerified)
+
+	err := database.DB.QueryRow(query, input.Email).
+		Scan(&user.ID, &user.Password, &user.Role, &user.IsVerified)
+
 	if err != nil {
 		helper.SendError(w, "البريد الإلكتروني أو كلمة المرور خطأ", http.StatusUnauthorized)
 		return
@@ -51,13 +56,17 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
 	accessExp := time.Now().Add(15 * time.Minute)
+
 	accessClaims := jwt.MapClaims{
 		"user_id": user.ID,
 		"role":    user.Role,
 		"exp":     accessExp.Unix(),
 	}
+
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
+
 	accessTokenString, err := accessToken.SignedString(jwtKey)
 	if err != nil {
 		helper.SendError(w, "حصل خطأ ما", http.StatusInternalServerError)
@@ -65,12 +74,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	refreshExp := time.Now().Add(7 * 24 * time.Hour)
+
 	refreshTokenBytes := make([]byte, 32)
 	_, err = rand.Read(refreshTokenBytes)
 	if err != nil {
 		helper.SendError(w, "حصل خطأ ما", http.StatusInternalServerError)
 		return
 	}
+
 	refreshTokenString := base64.URLEncoding.EncodeToString(refreshTokenBytes)
 
 	err = database.SaveRefreshToken(context.Background(), user.ID, refreshTokenString, refreshExp)
@@ -79,10 +90,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshTokenString,
+		HttpOnly: true,
+		Secure:   false, 
+		Path:     "/",
+		Expires:  refreshExp,
+		SameSite: http.SameSiteStrictMode,
+	})
+
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"access_token":  accessTokenString,
-		"refresh_token": refreshTokenString,
+		"access_token": accessTokenString,
 		"role":         user.Role,
 	})
 }
