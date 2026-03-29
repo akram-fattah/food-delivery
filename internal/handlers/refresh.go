@@ -14,20 +14,22 @@ import (
 var jwtKeyRefresh = helper.GetJWTKey()
 
 func RefreshToken(w http.ResponseWriter, r *http.Request) {
+	
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	var input struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil || input.RefreshToken == "" {
-		helper.SendError(w, "توكن غير صالح", http.StatusBadRequest)
+
+	cookie, err := r.Cookie("refresh_token")
+	if err != nil {
+		helper.SendError(w, "لم يتم العثور على التوكن", http.StatusUnauthorized)
 		return
 	}
 
-	userID, err := database.GetRefreshToken(context.Background(), input.RefreshToken)
+	refreshToken := cookie.Value
+
+	userID, err := database.GetRefreshToken(context.Background(), refreshToken)
 	if err != nil {
 		helper.SendError(w, "توكن غير صالح أو منتهي", http.StatusUnauthorized)
 		return
@@ -38,12 +40,31 @@ func RefreshToken(w http.ResponseWriter, r *http.Request) {
 		"user_id": userID,
 		"exp":     accessExp.Unix(),
 	}
+
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims)
 	accessTokenString, err := accessToken.SignedString(jwtKeyRefresh)
 	if err != nil {
 		helper.SendError(w, "حصل خطأ ما", http.StatusInternalServerError)
 		return
 	}
+
+	newRefreshToken := helper.GenerateRefreshToken()
+
+	err = database.UpdateRefreshToken(context.Background(), int64(userID), newRefreshToken)
+	if err != nil {
+		helper.SendError(w, "فشل تحديث التوكن", http.StatusInternalServerError)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    newRefreshToken,
+		HttpOnly: true,
+		Secure:   true, 
+		Path:     "/",
+		MaxAge:   7 * 24 * 60 * 60,
+		SameSite: http.SameSiteStrictMode,
+	})
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
