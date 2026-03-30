@@ -23,7 +23,13 @@ func HandleFunc() {
 	http.HandleFunc("/update/categories/", handlers.UpdateCategory)
 	http.HandleFunc("/delete/categories/", handlers.DeleteCategory)
 	http.HandleFunc("/create/meal", handlers.CreateMeal)
+	http.HandleFunc("/meals/", handlers.GetMealByID)
+	http.HandleFunc("/meals/by-category/", handlers.GetMealsByCategory)
+	http.HandleFunc("/meals/search", handlers.SearchMeals)
+
 	http.HandleFunc("/meals", handlers.GetMeals)
+	http.HandleFunc("/delete/meal/", handlers.DeleteMeal)
+	http.HandleFunc("/update/meal/", handlers.UpdateMeal)
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 
