@@ -60,6 +60,4 @@ func ConnectDB() {
 	case <-time.After(5 * time.Second):
 		log.Fatal("Database connection timeout")
 	}
-
-	log.Println("Database connected successfully")
 }

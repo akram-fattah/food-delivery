@@ -9,6 +9,7 @@ type Meal struct {
 	Price       float64   `json:"price"`
 	ImageURL    string    `json:"image_url"`
 	IsAvailable bool      `json:"is_available"`
-	CategoryID  int       `json:"category_id"`
+	CategoryID  int       `json:"-"`
 	CreatedAt   time.Time `json:"created_at"`
+	CategoryName string    `json:"category_name,omitempty"`
 }
