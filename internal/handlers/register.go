@@ -110,7 +110,7 @@ func Register(w http.ResponseWriter, r *http.Request) {
     </html>`
 	
 	go func() {
-		_ = helper.SendEmail(u.Email, body, code)
+		_ = helper.SendEmail("كود تفعيل حسابك", u.Email, body, code)
 	}()
 
 	helper.SendJSON(w, http.StatusCreated, map[string]string{
