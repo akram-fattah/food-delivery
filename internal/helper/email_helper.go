@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func SendEmail(toEmail string, bodyTemplate string, code string) error {
+func SendEmail(subject string, toEmail string, bodyTemplate string, code string) error {
 	from := os.Getenv("EMAIL")
 	password := os.Getenv("EMAIL_PASSWORD")
 
@@ -22,7 +22,7 @@ func SendEmail(toEmail string, bodyTemplate string, code string) error {
 	headers := make(map[string]string)
 	headers["From"] = from
 	headers["To"] = toEmail
-	headers["Subject"] = "كود تفعيل حسابك"
+	headers["Subject"] = subject
 	headers["MIME-Version"] = "1.0"
 	headers["Content-Type"] = `text/html; charset="UTF-8"`
 

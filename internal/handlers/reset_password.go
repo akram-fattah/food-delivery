@@ -68,7 +68,7 @@ func ResetPassword(w http.ResponseWriter, r *http.Request) {
     </html>`
 
 	go func() {
-		_ = helper.SendEmail(req.Email, body, code)
+		_ = helper.SendEmail("إعادة تعيين كلمة المرور", req.Email, body, code)
 	}()
 
 	helper.SendJSON(w, http.StatusOK, map[string]string{
