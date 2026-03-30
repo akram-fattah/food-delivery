@@ -15,6 +15,7 @@ func HandleFunc() {
 	http.HandleFunc("/auth/login", handlers.Login)
 	http.HandleFunc("/auth/update-password", handlers.UpdatePassword)
 	http.HandleFunc("/auth/refresh", handlers.RefreshToken)
+	http.HandleFunc("/auth/verify-reset-code", handlers.VerifyResetCode)
 
 	http.HandleFunc("/create/categories", handlers.CreateCategory)
 	http.HandleFunc("/categories", handlers.GetCategories)
