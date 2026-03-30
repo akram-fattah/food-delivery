@@ -91,3 +91,18 @@ func CreateMeal(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(meal)
 }
+
+func GetMeals(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.Header().Set("Allow", http.MethodGet)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	meals, err := database.GetMeals(context.Background())
+	if err != nil {
+		helper.SendError(w, "فشل جلب الوجبات", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(meals)
+}
