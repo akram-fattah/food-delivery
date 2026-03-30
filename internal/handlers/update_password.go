@@ -21,15 +21,12 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
 		return
 	}
-	if r.Method != http.MethodPost {
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		return
-	}
+
 
 	var req UpdatePasswordRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Email == "" || req.Code == "" || req.Password == "" || req.ConfirmPassword == "" {
 		helper.SendJSON(w, http.StatusOK, map[string]string{
-			"message": "تم تحديث كلمة المرور إذا كانت البيانات صحيحة.",
+			"message": "بيانات غير صالحة. يرجى التأكد من ملء جميع الحقول بشكل صحيح.",
 		})
 		return
 	}
@@ -80,6 +77,6 @@ func UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	helper.SendJSON(w, http.StatusOK, map[string]string{
-		"message": "تم تحديث كلمة المرور إذا كانت البيانات صحيحة.",
+		"message": "تم تحديث كلمة المرور.",
 	})
 }
