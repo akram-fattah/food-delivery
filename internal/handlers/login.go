@@ -19,12 +19,21 @@ import (
 )
 
 var jwtKey = helper.GetJWTKey()
+var loginAttempts = make(map[string]int)
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	godotenv.Load()
+
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	ip := r.RemoteAddr
+
+	if loginAttempts[ip] >= 5 {
+		helper.SendError(w, "تم حظر المحاولات مؤقتًا", http.StatusTooManyRequests)
 		return
 	}
 
@@ -45,6 +54,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Scan(&user.ID, &user.Password, &user.Role, &user.IsVerified)
 
 	if err != nil {
+		loginAttempts[ip]++ 
 		helper.SendError(w, "البريد الإلكتروني أو كلمة المرور خطأ", http.StatusUnauthorized)
 		return
 	}
@@ -55,10 +65,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)) != nil {
+		loginAttempts[ip]++
 		helper.SendError(w, "البريد الإلكتروني أو كلمة المرور خطأ", http.StatusUnauthorized)
 		return
 	}
 
+	delete(loginAttempts, ip)
 
 	accessExp := time.Now().Add(15 * time.Minute)
 
@@ -97,12 +109,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Name:     "refresh_token",
 		Value:    refreshTokenString,
 		HttpOnly: true,
-		Secure:   os.Getenv("ENV") == "production", 
+		Secure:   os.Getenv("ENV") == "production",
 		Path:     "/",
 		Expires:  refreshExp,
 		SameSite: http.SameSiteStrictMode,
 	})
-
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
