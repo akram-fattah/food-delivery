@@ -15,7 +15,7 @@ import (
 func CreateCategory(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
-		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	var cat models.Category
@@ -43,7 +43,7 @@ func CreateCategory(w http.ResponseWriter, r *http.Request) {
 func GetCategories(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
-		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	categories, err := database.GetCategories(context.Background())
@@ -58,7 +58,7 @@ func GetCategories(w http.ResponseWriter, r *http.Request) {
 func GetCategoryByID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.Header().Set("Allow", http.MethodGet)
-		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	id, err := helper.GetIDFromURL(r.URL.Path)

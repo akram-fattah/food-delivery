@@ -24,7 +24,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	godotenv.Load()
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
-		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 

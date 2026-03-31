@@ -11,7 +11,7 @@ import (
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
-		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 

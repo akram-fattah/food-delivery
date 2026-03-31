@@ -11,7 +11,7 @@ import (
 func VerifyResetCode(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
-		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
+		helper.SendError(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	req := struct {
@@ -32,4 +32,7 @@ func VerifyResetCode(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+	helper.SendJSON(w, http.StatusOK, map[string]string{
+		"message": "الكود صحيح.",
+	})
 }
