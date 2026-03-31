@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+	"os"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
@@ -14,11 +15,13 @@ import (
 	"github.com/akram-fattah/food-delivery/internal/database"
 	"github.com/akram-fattah/food-delivery/internal/helper"
 	"github.com/akram-fattah/food-delivery/internal/models"
+	"github.com/joho/godotenv"
 )
 
 var jwtKey = helper.GetJWTKey()
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	godotenv.Load()
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
 		helper.SendError(w, "Method Not Allowed", http.StatusInternalServerError)
@@ -94,7 +97,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		Name:     "refresh_token",
 		Value:    refreshTokenString,
 		HttpOnly: true,
-		Secure:   false, 
+		Secure:   os.Getenv("ENV") == "production", 
 		Path:     "/",
 		Expires:  refreshExp,
 		SameSite: http.SameSiteStrictMode,
