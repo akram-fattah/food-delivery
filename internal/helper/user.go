@@ -69,7 +69,7 @@ func ValidateUser(u models.User) error {
 		return errors.New("اسم المستخدم يجب أن يحتوي فقط على أحرف وأرقام وشرطات")
 	}
 
-	if len(u.Password) < 6 || len(u.Password) > 20{
+	if len(u.Password) < 8 || len(u.Password) > 20{
 		return errors.New("كلمة المرور يجب أن تكون 6 أحرف على الأقل و20 حرفًا كحد أقصى")
 	}
 	if !IsStrongPassword(u.Password) {
