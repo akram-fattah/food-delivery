@@ -113,3 +113,24 @@ func UpdateUserPasswordAndClearCode(ctx context.Context, email, hashedPassword s
 	_, err := DB.ExecContext(ctx, query, hashedPassword, email)
 	return err
 }
+
+func GetProfile(ctx context.Context, userID int) (models.User, error) {
+	var u models.User
+	query := `
+		SELECT id, name, username, email, phone, address, role, created_at
+		FROM users
+		WHERE id = $1
+	`
+	err := DB.QueryRowContext(ctx, query, userID).Scan(
+		&u.ID,
+		&u.Name,
+		&u.Username,
+		&u.Email,
+		&u.Phone,
+		&u.Address,
+		&u.Role,
+		&u.CreateAt,
+	)
+
+	return u, err
+}

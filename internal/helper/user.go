@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"fmt"
+	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/akram-fattah/food-delivery/internal/models"
 )
@@ -77,4 +79,41 @@ func ValidateUser(u models.User) error {
 	}
 
 	return nil
+}
+
+
+func ParseJWT(authHeader string) (int, error) {
+	var jwtKey = GetJWTKey()
+
+	tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
+	tokenStr = strings.TrimSpace(tokenStr)
+
+	if tokenStr == "" || tokenStr == authHeader {
+		return 0, fmt.Errorf("invalid token format")
+	}
+
+	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
+
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method")
+		}
+
+		return jwtKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		return 0, fmt.Errorf("invalid token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("invalid claims")
+	}
+
+	userIDFloat, ok := claims["user_id"].(float64)
+	if !ok {
+		return 0, fmt.Errorf("user_id not found in token")
+	}
+
+	return int(userIDFloat), nil
 }
