@@ -15,3 +15,12 @@ type User struct {
 	VerificationCode string    `json:"verification_code"`
 	CreateAt time.Time `json:"created_at"`
 }
+
+type UpdateUserRequest struct {
+	Name             *string `json:"name"`
+	Username         *string `json:"username"`
+	Email            *string `json:"email"`
+	Password         *string `json:"password"`
+	Phone            *string `json:"phone"`
+	Address          *string `json:"address"`
+}

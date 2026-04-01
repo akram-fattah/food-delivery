@@ -134,3 +134,31 @@ func GetProfile(ctx context.Context, userID int) (models.User, error) {
 
 	return u, err
 }
+
+func UpdateUser(ctx context.Context, userID int, req models.UpdateUserRequest) error {
+
+	query := `
+		UPDATE users SET
+			name = COALESCE($1, name),
+			username = COALESCE($2, username),
+			email = COALESCE($3, email),
+			password = COALESCE($4, password),
+			phone = COALESCE($5, phone),
+			address = COALESCE($6, address)
+		WHERE id = $7
+	`
+
+	_, err := DB.ExecContext(
+		ctx,
+		query,
+		req.Name,
+		req.Username,
+		req.Email,
+		req.Password,
+		req.Phone,
+		req.Address,
+		userID,
+	)
+
+	return err
+}
