@@ -32,6 +32,8 @@ func HandleFunc() {
 	http.HandleFunc("/update/meal/", handlers.UpdateMeal)
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
+	http.HandleFunc("/profile", handlers.GetProfile)
+
 
 }
 
