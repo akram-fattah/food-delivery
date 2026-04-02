@@ -156,3 +156,10 @@ func UpdateUser(ctx context.Context, userID int, req models.UpdateUserRequest) e
 
 	return err
 }
+
+func GetUserEmailByID(userID int) (string, error) {
+	var email string
+	query := `SELECT email FROM users WHERE id = $1`
+	err := DB.QueryRowContext(context.Background(), query, userID).Scan(&email)
+	return email, err
+}
