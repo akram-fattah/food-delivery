@@ -81,15 +81,14 @@ func ValidateUser(u models.User) error {
 	return nil
 }
 
-
-func ParseJWT(authHeader string) (int, error) {
+func ParseJWT(authHeader string) (int, string, error) {
 	var jwtKey = GetJWTKey()
 
 	tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 	tokenStr = strings.TrimSpace(tokenStr)
 
 	if tokenStr == "" || tokenStr == authHeader {
-		return 0, fmt.Errorf("invalid token format")
+		return 0, "", fmt.Errorf("invalid token format")
 	}
 
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
@@ -102,18 +101,20 @@ func ParseJWT(authHeader string) (int, error) {
 	})
 
 	if err != nil || !token.Valid {
-		return 0, fmt.Errorf("invalid token")
+		return 0, "", fmt.Errorf("invalid token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return 0, fmt.Errorf("invalid claims")
+		return 0, "", fmt.Errorf("invalid claims")
 	}
 
 	userIDFloat, ok := claims["user_id"].(float64)
 	if !ok {
-		return 0, fmt.Errorf("user_id not found in token")
+		return 0, "", fmt.Errorf("user_id not found in token")
 	}
 
-	return int(userIDFloat), nil
+	role, _ := claims["role"].(string)
+
+	return int(userIDFloat), role, nil
 }

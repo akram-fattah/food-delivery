@@ -23,7 +23,7 @@ func GetProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := helper.ParseJWT(authHeader)
+	userID,_, err := helper.ParseJWT(authHeader)
 	if err != nil {
 		helper.SendError(w, "Invalid token", http.StatusUnauthorized)
 		return
@@ -52,7 +52,7 @@ func UpdateProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID, err := helper.ParseJWT(authHeader)
+	userID, _, err := helper.ParseJWT(authHeader)
 	if err != nil {
 		helper.SendError(w, "Invalid token", http.StatusUnauthorized)
 		return
