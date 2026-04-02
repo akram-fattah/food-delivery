@@ -35,6 +35,9 @@ func HandleFunc() {
 	http.HandleFunc("/profile", handlers.GetProfile)
 	http.HandleFunc("/profile/update", handlers.UpdateProfile)
 
+	http.HandleFunc("/orders/create", handlers.CreateOrder)
+	http.HandleFunc("/orders", handlers.GetOrders)
+	http.HandleFunc("/orders/update-status/", handlers.UpdateOrderStatus)
 
 }
 

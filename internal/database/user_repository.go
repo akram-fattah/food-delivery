@@ -117,7 +117,7 @@ func UpdateUserPasswordAndClearCode(ctx context.Context, email, hashedPassword s
 func GetProfile(ctx context.Context, userID int) (models.User, error) {
 	var u models.User
 	query := `
-		SELECT id, name, username, email, phone, address, role, created_at
+		SELECT id, name, username, email, role, created_at
 		FROM users
 		WHERE id = $1
 	`
@@ -126,8 +126,6 @@ func GetProfile(ctx context.Context, userID int) (models.User, error) {
 		&u.Name,
 		&u.Username,
 		&u.Email,
-		&u.Phone,
-		&u.Address,
 		&u.Role,
 		&u.CreateAt,
 	)
@@ -142,10 +140,8 @@ func UpdateUser(ctx context.Context, userID int, req models.UpdateUserRequest) e
 			name = COALESCE($1, name),
 			username = COALESCE($2, username),
 			email = COALESCE($3, email),
-			password = COALESCE($4, password),
-			phone = COALESCE($5, phone),
-			address = COALESCE($6, address)
-		WHERE id = $7
+			password = COALESCE($4, password)
+		WHERE id = $5
 	`
 
 	_, err := DB.ExecContext(
@@ -155,8 +151,6 @@ func UpdateUser(ctx context.Context, userID int, req models.UpdateUserRequest) e
 		req.Username,
 		req.Email,
 		req.Password,
-		req.Phone,
-		req.Address,
 		userID,
 	)
 
