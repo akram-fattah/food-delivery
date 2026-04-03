@@ -5,6 +5,7 @@ import (
 
 	"github.com/akram-fattah/food-delivery/internal/database"
 	"github.com/akram-fattah/food-delivery/internal/handlers"
+	"github.com/akram-fattah/food-delivery/internal/whatsapp"
 )
 
 func HandleFunc() {
@@ -43,6 +44,7 @@ func HandleFunc() {
 
 func main() {
 	database.ConnectDB()
+	go whatsapp.StartWhatsAppBot()
 	HandleFunc()
 	http.ListenAndServe(":8000", nil)
 }
