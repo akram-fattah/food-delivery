@@ -4,9 +4,11 @@ import (
 	"github.com/akram-fattah/food-delivery/internal/helper"
 	"github.com/akram-fattah/food-delivery/internal/database"
 	"github.com/akram-fattah/food-delivery/internal/models"
+	"github.com/akram-fattah/food-delivery/internal/whatsapp"
 	"encoding/json"
 	"net/http"
 	"fmt"
+	"log"
 )
 
 
@@ -69,6 +71,13 @@ func CreateOrder(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	SendNotification(email, itemsWithDetails)
+	message := BuildOrderMessage(orderID, itemsWithDetails, totalPrice)
+
+	
+	err1 := whatsapp.SendMessage(req.Phone, message)
+	if err1 != nil {
+		log.Println("Error:", err1)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -76,6 +85,29 @@ func CreateOrder(w http.ResponseWriter, r *http.Request) {
 		"order_id": orderID,
 		"message":  "Order created successfully",
 	})
+}
+
+func BuildOrderMessage(orderID int, items []models.OrderItem, total float64) string {
+	msg := fmt.Sprintf("*مطعم الوحدة*\n")
+	msg += fmt.Sprintf("🧾 *تم تأكيد طلبك #%d*\n\n", orderID)
+
+	msg += "📦 *تفاصيل الطلب:*\n"
+
+	for i, item := range items {
+		msg += fmt.Sprintf(
+			"%d) %s\n   💰 السعر: %.2f\n   🔢 الكمية: %d\n   🧮 الإجمالي: %.2f\n\n",
+			i+1,
+			item.Name,
+			item.Price,
+			item.Quantity,
+			item.Price*float64(item.Quantity),
+		)
+	}
+
+	msg += fmt.Sprintf("━━━━━━━━━━━━━━\n💵 *المجموع النهائي:* %.2f ريال\n\n", total)
+	msg += "🙏 شكراً لطلبك منا!"
+
+	return msg
 }
 
 
