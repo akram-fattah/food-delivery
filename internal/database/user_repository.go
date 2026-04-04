@@ -137,11 +137,11 @@ func UpdateUser(ctx context.Context, userID int, req models.UpdateUserRequest) e
 
 	query := `
 		UPDATE users SET
-			name = COALESCE($1, name),
-			username = COALESCE($2, username),
+		name = COALESCE($1, name),
+		username = COALESCE($2, username),
 			email = COALESCE($3, email),
-			password = COALESCE($4, password)
-		WHERE id = $5
+			password = COALESCE($4, password),
+		WHERE id = $6
 	`
 
 	_, err := DB.ExecContext(
@@ -162,4 +162,18 @@ func GetUserEmailByID(userID int) (string, error) {
 	query := `SELECT email FROM users WHERE id = $1`
 	err := DB.QueryRowContext(context.Background(), query, userID).Scan(&email)
 	return email, err
+}
+
+func UpdateUserRole(ctx context.Context, userID int, role string) error {
+	query := `
+		UPDATE users SET role = $1 WHERE id = $2
+	`
+	_, err := DB.ExecContext(ctx, query, role, userID)
+	return err
+}
+func GetUsersIdFromEmail(ctx context.Context, email string) (int, error) {
+	var id int
+	query := `SELECT id FROM users WHERE email = $1`
+	err := DB.QueryRowContext(ctx, query, email).Scan(&id)
+	return id, err
 }
