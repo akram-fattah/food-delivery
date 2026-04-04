@@ -29,7 +29,7 @@ func StartWhatsAppBot() {
 
 	container := sqlstore.NewWithDB(database.DB, "postgres", dbLog)
 
-	err := container.Upgrade()
+	err := container.Upgrade(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
