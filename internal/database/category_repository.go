@@ -20,7 +20,7 @@ func CreateCategory(ctx context.Context, categoryName string) (int, error) {
 }
 
 func GetCategories(ctx context.Context) ([]map[string]interface{}, error) {
-	query := `SELECT category_name, created_at FROM categories`
+	query := `SELECT id, category_name, created_at FROM categories`
 	rows, err := DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -29,12 +29,14 @@ func GetCategories(ctx context.Context) ([]map[string]interface{}, error) {
 
 	var categories []map[string]interface{}
 	for rows.Next() {
+		var id int
 		var categoryName string
 		var createdAt time.Time
-		if err := rows.Scan(&categoryName, &createdAt); err != nil {
+		if err := rows.Scan(&id, &categoryName, &createdAt); err != nil {
 			return nil, err
 		}
 		categories = append(categories, map[string]interface{}{
+			"id":            id,
 			"category_name": categoryName,
 			"created_at":    createdAt,
 		})
